@@ -131,6 +131,38 @@ def copy_form(request, problem_pk):
             }
         )
 
+class MoveToProblemForm(Form):
+    problem_set_id = IntegerField(label='Problem set id')
+
+def move_to_form(request, problem_pk):
+    """
+    Show and react to MoveForm.
+    """
+    problem = Problem.objects.get(pk=problem_pk)
+    verify(request.user.can_edit_problem_set(problem.problem_set))
+    if request.method == 'POST':
+        form = MoveToProblemForm(request.POST)
+        if form.is_valid():
+            problem_set_pk = form.cleaned_data['problem_set_id']
+            problem_set = ProblemSet.objects.get(pk=problem_set_pk)
+            verify(request.user.can_edit_problem_set(problem_set))
+            problem.move_to(problem_set)
+            return redirect(problem_set)
+        else:
+            # TODO: handle errors
+            response = HttpResponse("Please select a problem set.")
+            return response
+    else:
+        form = MoveToProblemForm()
+        courses = request.user.taught_courses.all()
+        return render(
+            request, 'courses/problem_move_form.html',
+            {
+                'form': form,
+                'courses': courses,
+                'problem': problem,
+            }
+        )
 
 @login_required
 def problem_solution(request, problem_pk, user_pk):

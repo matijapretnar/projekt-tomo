@@ -1,0 +1,74 @@
+{% load i18n %}	
+
+<div class="modal-header">
+	<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    {# Translators: Title of move problem modal.#}
+    <h4 class="modal-title">{% trans "Move problem" %} {{ problem.title }}</h4>
+</div>
+<div class="modal-body">
+	{# Translators: Text of move problem modal.#}
+	{% trans "Please choose a problem set to move this problem to:" %}
+	
+	<form action="{% url 'problem_move_to' problem.id %}"  method="post" id='move_problem_form'>
+	    {% csrf_token %}
+		<input type="hidden" name="problem_set_id", id="problem_set_id">
+	    <div id='problem_list_tree'></div>
+	</form>		            
+</div>
+<div class="modal-footer">
+	<button class="btn btn-primary" id="button_move_confirm" disabled=true>
+	  {# Translators: Confirm moving a problem.#}
+	  {% trans "Move" %}
+	</button>
+	<button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
+</div>
+
+<script>
+function moveButtonDisabled(state) {	
+	$button = $("#button_move_confirm");
+	$button.attr("disabled", state);
+}
+
+function nodeSelected() {
+	moveButtonDisabled(false);
+}
+
+function nodeUnselected() {
+	moveButtonDisabled(true);
+}
+
+$('#button_move_confirm').on('click', function () {
+	selectedItem = $('#problem_list_tree').treeview('getSelected')[0];
+	console.log("tada");
+	console.log(selectedItem);
+	console.log(selectedItem.id);
+ 	$("#problem_set_id").val(selectedItem.id);
+    $("#move_problem_form").submit();
+});
+
+var data = [
+// Prepare data
+{% for course in courses %}      
+	{
+		text: "{{ course.title }}",
+		selectable: false,
+		nodes: [
+	{% for ps in course.problem_sets.all %}      
+		{
+			text: "{{ ps.title }}",
+			id: {{ ps.id }}
+		},	
+	{% endfor %}
+		]
+	},
+{% endfor %}
+];
+problem_tree = $('#problem_list_tree');
+problem_tree.treeview(
+	{
+		data: data,
+		levels: 1,
+		onNodeSelected: nodeSelected,
+		onNodeUnselected: nodeUnselected,
+	});
+</script>

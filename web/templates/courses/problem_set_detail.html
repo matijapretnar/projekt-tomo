@@ -104,6 +104,10 @@
                             data-toggle="tooltip" title="{% trans 'Copy' %}" data-container="body">
                           <i class="fa fa-copy" aria-hidden="true"></i>
                         </a>
+                        <a class="btn btn-default btn-for-modal edit-btn" aria-label="Move" data-url="{% url 'problem_move_to' problem.id %}"
+                            data-toggle="tooltip" title="{% trans 'Move to' %}" data-container="body">
+                          <i class="fa fa-arrows-alt" aria-hidden="true"></i>
+                        </a>
                         <a class="btn btn-default btn-for-modal edit-btn trash-btn" aria-label="Delete" data-url="{% url 'problem_delete' problem.id %}">
                           <i class="fa fa-trash" aria-hidden="true"></i>
                         </a>
